@@ -1,0 +1,14 @@
+[
+    {
+        "username":"reez",
+        "message":"first tweet"
+    },
+    {
+        "username":"reez",
+        "message":"second tweet"
+    },
+    {
+        "username":"reez",
+        "message":"third tweet"
+    }
+]
