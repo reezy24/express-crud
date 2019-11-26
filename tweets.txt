@@ -1,14 +1,1 @@
-[
-    {
-        "username":"reez",
-        "message":"first tweet"
-    },
-    {
-        "username":"reez",
-        "message":"second tweet"
-    },
-    {
-        "username":"reez",
-        "message":"third tweet"
-    }
-]
+[{"username":"reez","message":"first tweet"},{"username":"reez","message":"new tweet"},{"username":"reez","message":"69th tweet"}]

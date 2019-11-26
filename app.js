@@ -10,93 +10,86 @@ class Tweet {
     constructor(username, message) {
         this.username = username
         this.message = message
+        tweets.push(this)
+        saveTweets()
     }
 }
 
 let tweets = []
 
-function saveTweet(tweet) {
-    fs.appendFile(fileName, JSON.stringify(tweet) + ", \n", err => {
+// read from file and assign to tweets
+fs.readFile("tweets.txt", "utf-8", (err, tweetsString) => { 
+    if (err) {
+        throw err
+    } else {
+        tweets = JSON.parse(tweetsString)
+        console.log("All tweets loaded from file")
+    }
+})
+
+
+function saveTweets() {
+    fs.writeFile(fileName, JSON.stringify(tweets), err => {
         if (err) {
             throw err
         } else {
-            console.log("Tweet saved successfully")
+            console.log("All tweets saved successfully")
         }
     })
 }
 
-fs.writeFile(fileName, "", err => {
-    if (err) {
-        throw err
+function getTweet(id) {
+    if (id || id == 0) {
+        return tweets[id]
     } else {
-        console.log("Cleared file successfully")
+        // return entire array if no id is passed
+        return tweets
     }
-})
-
-// write all hard coded tweets to file
-//fs.writeFile("tweets.txt", JSON.stringify(tweets), err => console.log(err))
-
-function getTweet(callback, id) {
-    let prom = new Promise((res, rej) => {
-        fs.readFile("tweets.txt", "utf-8", (err, tweetsString) => { 
-            if (err) {
-                rej(err)
-            } else {
-                let json = JSON.parse(`[${tweetsString}]`)
-                if (id || id == 0) {
-                    res(json[id])
-                } else {
-                    res(json)
-                }
-            }
-        })
-    })
-    return prom.then(json => callback(json))
 }
 
-getTweet(json => console.log(json), 0)
+// testing new tweet function
+// setTimeout(() => new Tweet("reez", "new tweet"), 1000)
 
-// app
-//     .use(bodyParser.urlencoded({ extended: false }))
-//     .use(bodyParser.json())
+app
+    .use(bodyParser.urlencoded({ extended: false }))
+    .use(bodyParser.json())
 
-//     // read
-//     .get("/", (req, res) => {
-//         console.log("read")
-//         getTweet(json => res.send(json))
-//     })
+    // read
+    .get("/", (req, res) => {
+        console.log("read")
+        res.send(getTweet())
+    })
 
-//     // also read
-//     .get("/:id", (req, res) => {
-//         console.log("read single")
-//         getTweet(json => res.send(json), req.params.id)
-//     })
+    // also read
+    .get("/:id", (req, res) => {
+        console.log("read single")
+        res.send(getTweet(req.params.id))
+    })
 
-//     // create
-//     .post("/", (req, res) => {
-//         console.log("create")
-//         let tweet = new Tweet(req.body.username, req.body.message)
-//         tweets.push(tweet)
-//         res.send(tweets)
-//     })
+    // create
+    .post("/", (req, res) => {
+        console.log("create")
+        let tweet = new Tweet(req.body.username, req.body.message)
+        res.send(tweets)
+    })
 
-//     // update
-//     .post("/:id", (req, res) => {
-//         console.log("update")
-//         let tweet = tweets[req.params.id]
-//         tweet.message = req.body.message
-//         res.send(tweet)
-//     })
+    // update
+    .post("/:id", (req, res) => {
+        console.log("update")
+        let tweet = tweets[req.params.id]
+        tweet.message = req.body.message
+        saveTweets()
+        res.send(tweet)
+    })
 
-//     // delete
-//     .delete("/:id", (req, res) => {
-//         console.log("delete")
-//         tweets.splice(req.params.id, 1)
-//         console.log(req.params.id)
-//         console.log(tweets) 
-//         res.send(tweets)
-//     })
+    // delete
+    .delete("/:id", (req, res) => {
+        console.log("delete")
+        tweets.splice(req.params.id, 1)
+        saveTweets()
+        res.send(tweets)
+    })
 
-//     .listen(port, () => {
-//         console.log(`listening on port ${port}`)
-//     })
+    .listen(port, () => {
+        console.log(`listening on port ${port}`)
+    })
