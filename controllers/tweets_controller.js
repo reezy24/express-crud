@@ -2,26 +2,30 @@ let Tweets = require("../models/tweets.js")
 
 function index(req, res) {
     console.log("read")
-    res.send(Tweets.getTweet())
+    Tweets.getAllTweets()
+        .then( tweets => res.send(tweets) )
+        .catch( err => res.status(500).send(err) )
 }
 
 function show(req, res) {
     console.log("read single")
-    res.send(Tweets.getTweet(req.params.id))
+    Tweets.getTweet(req.params.id)
+        .then( tweet => res.send(tweet) )
+        .catch( err => res.status(500).send(err) )
 }
 
 function create(req, res) {
     console.log("create")
-    let tweet = new Tweets.Tweet(req.body.username, req.body.message)
-    res.send(Tweets.getTweet())
+    Tweets.createTweet(req.body.username, req.body.message)
+        .then( tweet => res.send(tweet) )
+        .catch( err => res.status(500).send(err) )
 }
 
 function update(req, res) {
     console.log("update")
-    let tweet = Tweets.getTweet(req.params.id)
-    tweet.message = req.body.message
-    Tweets.saveTweets()
-    res.send(tweet)
+    Tweets.updateTweet(req.body.id, req.body.message)
+        .then( tweet => res.send(tweet) )
+        .catch( err => res.status(500).send(err) )
 }
 
 function delete_(req, res) {

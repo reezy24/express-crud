@@ -1,50 +1,53 @@
-const fs = require("fs")
-const fileName = "tweets.txt"
+const mongoose = require('mongoose')
 
-class Tweet {
-    constructor(username, message) {
-        this.username = username
-        this.message = message
-        tweets.push(this)
-        saveTweets()
-    }
-}
-
-let tweets = []
-
-// read from file and assign to tweets
-fs.readFile("tweets.txt", "utf-8", (err, tweetsString) => { 
-    if (err) {
-        throw err
-    } else {
-        tweets = JSON.parse(tweetsString)
-        console.log("All tweets loaded from file")
+const TweetSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true
+    },
+    message: {
+        type: String, 
+        required: true
     }
 })
 
+const TweetModel = mongoose.model("tweet", TweetSchema)
 
-function saveTweets() {
-    fs.writeFile(fileName, JSON.stringify(tweets), err => {
-        if (err) {
-            throw err
-        } else {
-            console.log("All tweets saved successfully")
-        }
-    })
+// class Tweet {
+//     constructor(username, message) {
+//         this.username = username
+//         this.message = message
+//     }
+// }
+
+function createTweet(username, message) {
+    return TweetModel.create({username, message})
+}
+
+function getAllTweets() {
+    return TweetModel.find()
 }
 
 function getTweet(id) {
-    if (id || id == 0) {
-        return tweets[id]
-    } else {
-        // return entire array if no id is passed
-        return tweets
-    }
+    let prom = new Promise((resolve, reject) => {
+        getAllTweets().then(tweets => resolve(tweets[id]))
+    })
+    return prom
+}
+
+function updateTweet(id, newMessage) {
+    return new Promise((resolve, reject) => {
+        getTweet(id)
+            .then(tweet => {
+                // get the object id, update using this
+                resolve(TweetModel.updateOne({ _id: tweet._id }, { $set: { message: newMessage } }))
+            })
+    })
+    
 }
 
 function deleteTweet(id) {
-    tweets.splice(id, 1)
-    saveTweets()
+
 }
 
-module.exports = { getTweet, Tweet, saveTweets, deleteTweet }
+module.exports = { getTweet, getAllTweets, createTweet, deleteTweet, updateTweet }

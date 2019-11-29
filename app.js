@@ -1,12 +1,13 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const routes = require("./routes.js")
+const mongoose = require("mongoose")
 
 const port = 4114
 const app = express()
 
-// testing new tweet function
-// setTimeout(() => new Tweet("reez", "new tweet"), 1000)
+mongoose.connect("mongodb://localhost/contact_app", { useNewUrlParser: true })
+mongoose.connection.on("error", error => console.log(error))
 
 app
     .use(bodyParser.urlencoded({ extended: false }))
